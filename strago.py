@@ -28,29 +28,31 @@ nf  = f / trn
 ndata = ColumnDataSource(data=dict(t=t, trn=trn))
 
 #Full lightcurve
-plot = figure(plot_height=200, plot_width=1000, title='Lightcurve',
+plot = figure(plot_height=200, plot_width=1000, title='Curva de luz',
               x_range=[np.nanmin(t), np.nanmax(t)])
 
 plot.circle('t', 'f', source=src, size=1)
 #plot.line('t', 'trn', source=ndata, line_width=1, color='lime')
 
 #BLS
-pgram = figure(width=1000, height=200, x_range=[0,20])
+pgram = figure(width=1000, height=200, x_range=[0,20], title='Periodograma (BLS)')
 blsre = bls.eebls(t, nf, np.ones(len(t)), np.ones(len(t)), 50000, 1/30., 1e-4, 250, 0.01, 0.15)
 freqs = 1 / np.arange(1/30., 1/30. + 50000*1e-4, 1e-4)
 
 blsda = ColumnDataSource(data=dict(per=freqs, pow=blsre[0]))
 pgram.line('per', 'pow', source=blsda)
 
+'''
 #GLS
 glsf, glsp = LombScargle(t, f).autopower(minimum_frequency=1/20., maximum_frequency=1/0.1)
 glsfig = figure(width=1000, height=200)
 glsdat = ColumnDataSource(data=dict(per=1/glsf, pow=glsp))
 
 glsfig.line('per', 'pow', source=glsdat)
+'''
 
 #Phased lightcurve
-pha = figure(width=400, height=200, x_range=[-.03,.03])
+pha = figure(width=400, height=200, x_range=[-.03,.03], title='Curva de luz faseada')
 per = blsre[1] if args.period is None else args.period
 
 inn = np.median([blsre[-2], blsre[-1]])
@@ -165,7 +167,7 @@ phar.circle('ph', 'resi', source=resrc, size=2, line_color='black')
 '''
 
 #Orbit plot
-orbit = figure(width=400, height=400, match_aspect=True)
+orbit = figure(width=400, height=400, match_aspect=True, title='Orbita')
 
 et = np.linspace(0, 2*np.pi, 360)
 er = (ba.value*(1-becc.value**2))/(1+becc.value*np.cos(et))
@@ -180,7 +182,7 @@ osun   = orbit.circle('xc', 'yc', radius='sn', source=sundat, fill_color='yellow
 
 
 #Line of sight view
-los = figure(width=400, height=400, x_range=[-3,3], y_range=[-3,3])
+los = figure(width=400, height=400, x_range=[-3,3], y_range=[-3,3], title='Linea de vision')
 #orbdat = ColumnDataSource(data=dict(x=np.linspace(-2.5*brs.value, 2.5*brs.value, 100), y=np.zeros(100)))
 
 los.circle('xc', 'yc', radius='s', source=sundat, fill_color='yellow')
