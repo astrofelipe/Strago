@@ -138,7 +138,7 @@ def update_batman(attrname, old, new):
     #params.per = bper.value
     params.rp  = rps/brs.value
     #params.t0  = bt0.value
-    params.a   = ars*brs.value
+    params.a   = ars/brs.value
     params.u   = [bu1.value, bu2.value]
     params.ecc = becc.value
     params.inc = binc.value
