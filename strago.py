@@ -113,9 +113,9 @@ brp  = Slider(title='Radio planeta (R_Earth)', value=10, start=0.5, end=50, step
 brs  = Slider(title='Radio estrella (R_Sun)', value=1, start=0.05, end=10, step=1e-3)
 ba   = Slider(title='Distancia a la estrella (UA)', value=0.05, start=0.001, end=1.5, step=1e-4)
 becc = Slider(title='Excentricidad', value=params.ecc, start=0, end=1, step=1e-3)
-binc = Slider(title='Inclinación (grados)', value=params.inc, start=80, end=100, step=1e-5)
-bu1  = Slider(title='Limb Darkening u1', value=params.u[0], start=0, end=1, step=1e-4)
-bu2  = Slider(title='Limb Darkening u2', value=params.u[1], start=0, end=1, step=1e-4)
+binc = Slider(title='Inclinación (grados)', value=params.inc, start=80, end=100, step=1e-3)
+bu1  = Slider(title='Limb Darkening u1', value=params.u[0], start=0, end=1, step=1e-3)
+bu2  = Slider(title='Limb Darkening u2', value=params.u[1], start=0, end=1, step=1e-3)
 
 #Widgets "basic"
 #period = Slider(title='Period', value=per, start=0.1, end=40., step=0.001)
