@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(description='Lightcurve tools')
 parser.add_argument('File')
 parser.add_argument('--period', type=float, default=None)
 parser.add_argument('--t0', type=float, default=None)
+parser.add_argument('--sigmaclip', action='store_true')
 args = parser.parse_args()
 
 #Data
@@ -27,12 +28,13 @@ trn = median_filter(f, size=Nmf)
 nf  = f / trn
 
 #Sigma clip
-std = np.nanstd(nf)
-outl = np.abs(nf - 1) < 5*std
-t = t[outl]
-f = f[outl]
-nf = nf[outl]
-trn = trn[outl]
+if args.sigmaclip:
+    std = np.nanstd(nf)
+    outl = np.abs(nf - 1) < 5*std
+    t = t[outl]
+    f = f[outl]
+    nf = nf[outl]
+    trn = trn[outl]
 
 ndata = ColumnDataSource(data=dict(t=t, trn=trn))
 
@@ -109,13 +111,13 @@ bsrc = ColumnDataSource(data=dict(pb=pb[psort], fb=fb[psort], tb=tb, fb2=fb*trn)
 pha.line('pb', 'fb', source=bsrc, line_color='firebrick')
 
 #Widgets BATMAN
-brp  = Slider(title='Radio planeta (R_Earth)', value=10, start=0.5, end=50, step=1e-3)
-brs  = Slider(title='Radio estrella (R_Sun)', value=1, start=0.05, end=10, step=1e-3)
-ba   = Slider(title='Distancia a la estrella (UA)', value=0.05, start=0.001, end=1.5, step=1e-4)
-becc = Slider(title='Excentricidad', value=params.ecc, start=0, end=1, step=1e-3)
-binc = Slider(title='Inclinación (grados)', value=params.inc, start=80, end=100, step=1e-3)
-bu1  = Slider(title='Limb Darkening u1', value=params.u[0], start=0, end=1, step=1e-3)
-bu2  = Slider(title='Limb Darkening u2', value=params.u[1], start=0, end=1, step=1e-3)
+brp  = Slider(title='Radio planeta (R_Earth)', value=10, start=0.5, end=50, step=1e-3, format='0[.]000')
+brs  = Slider(title='Radio estrella (R_Sun)', value=1, start=0.05, end=10, step=1e-3, format='0[.]000')
+ba   = Slider(title='Distancia a la estrella (UA)', value=0.05, start=0.001, end=1.5, step=1e-4, format='0[.]0000')
+becc = Slider(title='Excentricidad', value=params.ecc, start=0, end=1, step=1e-3, format='0[.]000')
+binc = Slider(title='Inclinación (grados)', value=params.inc, start=80, end=100, step=1e-3, format='0[.]000')
+bu1  = Slider(title='Limb Darkening u1', value=params.u[0], start=0, end=1, step=1e-3, format='0[.]000')
+bu2  = Slider(title='Limb Darkening u2', value=params.u[1], start=0, end=1, step=1e-3, format='0[.]000')
 
 #Widgets "basic"
 #period = Slider(title='Period', value=per, start=0.1, end=40., step=0.001)
