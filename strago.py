@@ -25,18 +25,34 @@ src   = ColumnDataSource(data=dict(t=t, f=f))
 Nmf = int(np.sqrt(len(t)))
 trn = median_filter(f, size=Nmf)
 nf  = f / trn
+
+#Sigma clip
+std = np.nanstd(nf)
+outl = np.abs(nf - 1) < 5*std
+t = t[outl]
+f = f[outl]
+nf = nf[outl]
+trn = trn[outl]
+
 ndata = ColumnDataSource(data=dict(t=t, trn=trn))
 
 #Full lightcurve
 plot = figure(plot_height=200, plot_width=1000, title='Curva de luz',
               x_range=[np.nanmin(t), np.nanmax(t)])
 
+plot.xaxis.axis_label = 'Tiempo (dias)'
+plot.yaxis.axis_label = 'Flujo'
+
 plot.circle('t', 'f', source=src, size=1)
 #plot.line('t', 'trn', source=ndata, line_width=1, color='lime')
 
 #BLS
-pgram = figure(width=1000, height=200, x_range=[0,20], title='Periodograma (BLS)')
 blsre = bls.eebls(t, nf, np.ones(len(t)), np.ones(len(t)), 50000, 1/30., 1e-4, 250, 0.01, 0.15)
+per   = blsre[1] if args.period is None else args.period
+
+pgram = figure(width=1000, height=200, x_range=[0,20], title='Periodograma (BLS)')
+pgram.xaxis.axis_label = 'Periodo'
+pgram.yaxis.axis_label = 'Potencia'
 freqs = 1 / np.arange(1/30., 1/30. + 50000*1e-4, 1e-4)
 
 blsda = ColumnDataSource(data=dict(per=freqs, pow=blsre[0]))
@@ -52,16 +68,18 @@ glsfig.line('per', 'pow', source=glsdat)
 '''
 
 #Phased lightcurve
-pha = figure(width=400, height=200, x_range=[-.03,.03], title='Curva de luz faseada')
-per = blsre[1] if args.period is None else args.period
+pha = figure(width=400, height=200, x_range=[-.05*per*24,.05*per*24], title='Curva de luz faseada')
+pha.xaxis.axis_label = 'Horas desde el centro del transito'
+pha.yaxis.axis_label = 'Flujo normalizado'
 
 inn = np.median([blsre[-2], blsre[-1]])
 t0  = t[0] + per*(inn/250.) if args.t0 is None else args.t0
 
 ph     = (t-t0) / per % 1.0
 ph[ph>0.5] -= 1.0
-offset = ph[np.argmin(nf)]
-ph -= offset
+ph *= per * 24.
+#offset = ph[np.argmin(nf)]
+#ph -= offset
 
 phsrc = ColumnDataSource(data=dict(ph=ph, pf=nf))
 pha.circle('ph', 'pf', source=phsrc, size=2, line_color='black')
@@ -82,6 +100,7 @@ params.limb_dark = "quadratic"       #limb darkening model
 tb = np.copy(t)#np.linspace(t.min(), t.max(), 10000)
 pb = (tb - params.t0) / params.per % 1.0
 pb[pb>0.5] -= 1.0
+pb *= per * 24.
 psort = np.argsort(pb)
 mb = batman.TransitModel(params, tb)
 fb = mb.light_curve(params)
@@ -106,9 +125,11 @@ b = params.a * np.cos(np.radians(params.inc))
 txtper = TextInput(value=str(per), title='Periodo')
 txtt0  = TextInput(value=str(t0), title='t0')
 txtb   = TextInput(value='%.3f' % b, title='Parametro de impacto')
+txtaR  = TextInput(value='%.3f' % params.a, title='a/Rs')
 
 
-inputs = widgetbox(txtper, txtt0, txtb)
+
+inputs = widgetbox(txtper, txtt0, txtb, txtaR)
 
 def update_batman(attrname, old, new):
     rps = brp.value * 0.009158 #Earth radii in Sun radii
@@ -139,6 +160,7 @@ def update_batman(attrname, old, new):
 
     b = params.a * np.cos(np.radians(params.inc))
     txtb.value  = '%.3f' % b
+    txtaR.value = '%.3f' % params.a
     pladat.data = dict(xc=[0], yc=[b], s=[brp.value*0.009158])
 
     '''
