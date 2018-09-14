@@ -109,8 +109,8 @@ bsrc = ColumnDataSource(data=dict(pb=pb[psort], fb=fb[psort], tb=tb, fb2=fb*trn)
 pha.line('pb', 'fb', source=bsrc, line_color='firebrick')
 
 #Widgets BATMAN
-brp  = Slider(title='Radio planeta (R_Earth)', value=10, start=0.5, end=50, step=1e-5)
-brs  = Slider(title='Radio estrella (R_Sun)', value=1, start=0.05, end=10, step=1e-5)
+brp  = Slider(title='Radio planeta (R_Earth)', value=10, start=0.5, end=50, step=1e-3)
+brs  = Slider(title='Radio estrella (R_Sun)', value=1, start=0.05, end=10, step=1e-3)
 ba   = Slider(title='Distancia a la estrella (UA)', value=0.05, start=0.001, end=1.5, step=1e-4)
 becc = Slider(title='Excentricidad', value=params.ecc, start=0, end=1, step=1e-3)
 binc = Slider(title='Inclinación (grados)', value=params.inc, start=80, end=100, step=1e-5)
