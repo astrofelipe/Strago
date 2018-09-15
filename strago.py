@@ -160,10 +160,10 @@ def update_batman(attrname, old, new):
     odata.data = dict(x=ex, y=ey)
     sundat.data = dict(xc=[0], yc=[0], s=[brs.value], sn=[brs.value/215.])
 
-    b = params.a * np.cos(np.radians(params.inc))
+    b = params.a * np.cos(np.radians(params.inc)) * (1-params.ecc**2) / (1+params.ecc)
     txtb.value  = '%.3f' % b
     txtaR.value = '%.3f' % params.a
-    pladat.data = dict(xc=[0], yc=[b], s=[brp.value*0.009158])
+    pladat.data = dict(xc=[0], yc=[b*brs.value], s=[brp.value*0.009158])
 
     '''
     xor = np.linspace(-2.5*brs.value, 2.5*brs.value, 100)
@@ -212,7 +212,7 @@ los = figure(width=400, height=400, x_range=[-3,3], y_range=[-3,3], title='Linea
 los.circle('xc', 'yc', radius='s', source=sundat, fill_color='yellow')
 #los.line('x','y', source=orbdat)
 
-pladat = ColumnDataSource(data=dict(xc=[0], yc=[b], s=[brp.value*0.009158]))
+pladat = ColumnDataSource(data=dict(xc=[0], yc=[b*brs.value], s=[brp.value*0.009158]))
 los.circle('xc', 'yc', radius='s', source=pladat, fill_color='brown')
 
 
