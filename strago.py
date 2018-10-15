@@ -4,7 +4,7 @@ from bokeh.models import ColumnDataSource
 from bokeh.models.widgets import Slider, TextInput, Toggle
 from bokeh.io import curdoc
 from scipy.ndimage.filters import median_filter
-from astropy.stats import LombScargle
+#from astropy.stats import LombScargle
 import bls
 import numpy as np
 import argparse
@@ -49,6 +49,7 @@ plot.circle('t', 'f', source=src, size=1)
 #plot.line('t', 'trn', source=ndata, line_width=1, color='lime')
 
 #BLS
+print 'Calculando período...'
 blsre = bls.eebls(t, nf, np.ones(len(t)), np.ones(len(t)), 50000, 1/30., 1e-4, 250, 0.01, 0.15)
 per   = blsre[1] if args.period is None else args.period
 
@@ -59,6 +60,7 @@ freqs = 1 / np.arange(1/30., 1/30. + 50000*1e-4, 1e-4)
 
 blsda = ColumnDataSource(data=dict(per=freqs, pow=blsre[0]))
 pgram.line('per', 'pow', source=blsda)
+print 'Done!'
 
 '''
 #GLS
@@ -124,14 +126,16 @@ bu2  = Slider(title='Limb Darkening u2', value=params.u[1], start=0, end=1, step
 #t0w    = Slider(title='t0', value=t0, start=t0-2, end=t0+2, step=1e-6)
 b = params.a * np.cos(np.radians(params.inc))
 
-txtper = TextInput(value=str(per), title='Periodo')
-txtt0  = TextInput(value=str(t0), title='t0')
-txtb   = TextInput(value='%.3f' % b, title='Parametro de impacto')
-txtaR  = TextInput(value='%.3f' % params.a, title='a/Rs')
+txtper  = TextInput(value=str(per), title='Periodo')
+txtt0   = TextInput(value=str(t0), title='t0')
+txtb    = TextInput(value='%.5f' % b, title='Parametro de impacto')
+txtaR   = TextInput(value='%.5f' % params.a, title='a/Rs')
+txtrprs = TextInput(value='%.5f' % params.rp, title='Rp/Rs')
 
 
 
-inputs = widgetbox(txtper, txtt0, txtb, txtaR)
+
+inputs = widgetbox(txtper, txtt0, txtb, txtaR, txtrprs)
 
 def update_batman(attrname, old, new):
     rps = brp.value * 0.009158 #Earth radii in Sun radii
@@ -161,8 +165,9 @@ def update_batman(attrname, old, new):
     sundat.data = dict(xc=[0], yc=[0], s=[brs.value], sn=[brs.value/215.])
 
     b = params.a * np.cos(np.radians(params.inc)) * (1-params.ecc**2) / (1+params.ecc)
-    txtb.value  = '%.3f' % b
-    txtaR.value = '%.3f' % params.a
+    txtb.value  = '%.5f' % b
+    txtaR.value = '%.5f' % params.a
+    txtrprs.value = '%.5f' % params.rp
     pladat.data = dict(xc=[0], yc=[b*brs.value], s=[brp.value*0.009158])
 
     '''
