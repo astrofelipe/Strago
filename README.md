@@ -2,7 +2,6 @@
 Interactive LC viewer
 
 ![Strago](https://github.com/astrofelipe/Strago/raw/master/img/strago.png)
-
 ![Preview](https://github.com/astrofelipe/Strago/raw/master/img/stragopreview.png)
 
 # Usage
