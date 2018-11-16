@@ -1,5 +1,5 @@
 # Strago
-Interactive LC viewer
+Interactive LC viewer and transit fit
 
 ![Strago](https://github.com/astrofelipe/Strago/raw/master/img/strago.png)
 ![Preview](https://github.com/astrofelipe/Strago/raw/master/img/stragopreview.png)
