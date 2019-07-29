@@ -7,7 +7,7 @@ Interactive LC viewer and transit fit
 # Usage
 From terminal:
 
-bokeh serve --show rstrago.py --args <file with data>
+bokeh serve --show strago.py --args <file with data>
   
 Data should be in two columns: time and flux
 
