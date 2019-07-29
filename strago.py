@@ -1,3 +1,4 @@
+import __future__
 from bokeh.plotting import figure, show
 from bokeh.layouts import gridplot, widgetbox, row, layout
 from bokeh.models import ColumnDataSource
@@ -5,7 +6,7 @@ from bokeh.models.widgets import Slider, TextInput, Toggle
 from bokeh.io import curdoc
 from scipy.ndimage.filters import median_filter
 #from astropy.stats import LombScargle
-import bls
+from astropy.stats import BoxLeastSquares as BLS
 import numpy as np
 import argparse
 import batman
@@ -49,18 +50,21 @@ plot.circle('t', 'f', source=src, size=1)
 #plot.line('t', 'trn', source=ndata, line_width=1, color='lime')
 
 #BLS
-print 'Calculando período...'
-blsre = bls.eebls(t, nf, np.ones(len(t)), np.ones(len(t)), 50000, 1/30., 1e-4, 250, 0.01, 0.15)
-per   = blsre[1] if args.period is None else args.period
+print('Calculando período...')
+durations = np.linspace(0.05, 0.2, 60)
+model     = BLS(t,f)
+result    = model.autopower(durations, frequency_factor=2.0)
+idx       = np.argmax(result.power)
+per       = result.period[idx] if args.period is None else args.period
 
 pgram = figure(width=1000, height=200, x_range=[0,20], title='Periodograma (BLS)')
 pgram.xaxis.axis_label = 'Periodo'
 pgram.yaxis.axis_label = 'Potencia'
 freqs = 1 / np.arange(1/30., 1/30. + 50000*1e-4, 1e-4)
 
-blsda = ColumnDataSource(data=dict(per=freqs, pow=blsre[0]))
-pgram.line('per', 'pow', source=blsda)
-print 'Done!'
+#blsda = ColumnDataSource(data=dict(per=freqs, pow=blsre[0]))
+#pgram.line('per', 'pow', source=blsda)
+print('Done!')
 
 '''
 #GLS
@@ -76,8 +80,9 @@ pha = figure(width=400, height=200, x_range=[-.05*per*24,.05*per*24], title='Cur
 pha.xaxis.axis_label = 'Horas desde el centro del transito'
 pha.yaxis.axis_label = 'Flujo normalizado'
 
-inn = np.median([blsre[-2], blsre[-1]])
-t0  = t[0] + per*(inn/250.) if args.t0 is None else args.t0
+#inn = np.median([blsre[-2], blsre[-1]])
+#t0  = t[0] + per*(inn/250.) if args.t0 is None else args.t0
+t0     = result.transit_time[idx]
 
 ph     = (t-t0) / per % 1.0
 ph[ph>0.5] -= 1.0
